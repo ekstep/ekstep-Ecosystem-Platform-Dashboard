@@ -1,10 +1,11 @@
 define(function (require) {
-  return function KibanaControllerInit($rootScope, $scope, $location, courier, $http, globalState, notify) {
+  return function KibanaControllerInit($rootScope, $scope, $location, courier, $http, globalState, notify, editable) {
     // expose some globals
     $rootScope.globalState = globalState;
 
     // and some local values
     $scope.appEmbedded = $location.search().embed || false;
+    $scope.editable = editable;
     $scope.httpActive = $http.pendingRequests;
     $scope.notifList = notify._notifs;
 

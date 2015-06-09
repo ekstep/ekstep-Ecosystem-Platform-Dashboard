@@ -52,7 +52,7 @@ define(function (require) {
         self.ready = Promise.all([ kbnSetup(), config.init() ])
         .then(function () {
           // load some "mixins"
-          var mixinLocals = { $scope: $scope, notify: notify };
+          var mixinLocals = { $scope: $scope, notify: notify, editable: config.file.editable};
           $injector.invoke(require('plugins/kibana/_init'), self, mixinLocals);
           $injector.invoke(require('plugins/kibana/_apps'), self, mixinLocals);
           $injector.invoke(require('plugins/kibana/_timepicker'), self, mixinLocals);

@@ -3,7 +3,8 @@ define(function (require) {
   var _ = require('lodash');
   var rison = require('utils/rison');
 
-  module.directive('savedObjectFinder', function (savedSearches, savedVisualizations, savedDashboards, $location, kbnUrl) {
+
+  module.directive('savedObjectFinder', function (savedSearches, savedVisualizations, savedDashboards, $location, kbnUrl, configFile) {
 
     var vars = {
       searches: {
@@ -53,6 +54,7 @@ define(function (require) {
 
         // the list of hits, used to render display
         $scope.hits = [];
+        $scope.editable = configFile.editable;
 
         /**
          * Passed the hit objects and will determine if the

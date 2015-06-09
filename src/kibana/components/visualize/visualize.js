@@ -19,7 +19,9 @@ define(function (require) {
         vis: '=',
         editableVis: '=?',
         esResp: '=?',
-        searchSource: '=?'
+        searchSource: '=?',
+        editable: '@'
+
       },
       template: require('text!components/visualize/visualize.html'),
       link: function ($scope, $el, attr) {
