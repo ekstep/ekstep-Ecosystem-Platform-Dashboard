@@ -3,8 +3,7 @@ define(function (require) {
     var _ = require('lodash');
 
     var createColorPalette = Private(require('components/vislib/components/color/color_palette'));
-    var MappedColors = Private(require('components/vislib/components/color/mapped_colors'));
-    var mappedColors = new MappedColors();
+
     /*
      * Accepts an array of strings or numbers that are used to create a
      * a lookup table that associates the values (key) with a hex color (value).
@@ -24,14 +23,10 @@ define(function (require) {
       });
 
       var arrayLength = arrayOfStringsOrNumbers.length;
-      var colors = createColorPalette(arrayLength + mappedColors.count());
-      var uniqueColors = _.difference(colors, mappedColors.all()).slice(0, arrayLength + 1);
-      var colorObj = _.zipObject(arrayOfStringsOrNumbers, uniqueColors);
+      var colorObj = _.zipObject(arrayOfStringsOrNumbers, createColorPalette(arrayLength));
 
       return function (value) {
-        if (!mappedColors.get(value))
-          mappedColors.add(value, colorObj[value]);
-        return mappedColors.get(value);
+        return colorObj[value];
       };
     };
   };
