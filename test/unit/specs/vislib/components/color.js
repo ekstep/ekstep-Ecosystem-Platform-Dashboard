@@ -158,7 +158,7 @@ define(function (require) {
         mappedColors.reset();
         mappedColors.add('value1', '#colors1');
         mappedColors.add('value3', '#newColor');
-        expect(mappedColors.all()).to.equal(['#colors1', '#newColor']);
+        expect(mappedColors.all()).to.eql(['#colors1', '#newColor']);
       });
     });
 
