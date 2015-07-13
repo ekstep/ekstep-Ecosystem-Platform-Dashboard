@@ -112,7 +112,7 @@ define(function (require) {
               if (!orderBy && prevOrderBy === INIT) {
                 // abort until we get the responseValueAggs
                 if (!$scope.responseValueAggs) return;
-                params.orderBy = (_.first($scope.responseValueAggs) || { id: 'custom' }).id;
+                params.orderBy = (_.first($scope.responseValueAggs) || { id: 'custom' } || {id: 'x_axis'}).id;
                 return;
               }
 
@@ -123,7 +123,7 @@ define(function (require) {
               if (!orderBy || orderBy !== 'custom') {
                 params.orderAgg = null;
                 // ensure that orderBy is set to a valid agg
-                if (!_.find($scope.responseValueAggs, { id: orderBy })) {
+                if (!_.find($scope.responseValueAggs, { id: orderBy }) && orderBy !== '_term') {
                   params.orderBy = null;
                 }
                 return;
@@ -137,6 +137,11 @@ define(function (require) {
             var dir = agg.params.order.val;
             var order = output.params.order = {};
 
+            if (agg.params.orderBy === '_term') {
+              order._term = dir;
+              return;
+            }
+
             var orderAgg = agg.params.orderAgg || vis.aggs.getResponseAggById(agg.params.orderBy);
 
             // TODO: This works around an Elasticsearch bug the always casts terms agg scripts to strings
@@ -146,7 +151,7 @@ define(function (require) {
               output.params.valueType = agg.field().type === 'number' ? 'float' : agg.field().type;
             }
 
-            if (!orderAgg || orderAgg.type.name === 'count') {
+            if (orderAgg.type.name === 'count') {
               order._count = dir;
               return;
             }
