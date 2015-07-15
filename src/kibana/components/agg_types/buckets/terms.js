@@ -151,7 +151,7 @@ define(function (require) {
               output.params.valueType = agg.field().type === 'number' ? 'float' : agg.field().type;
             }
 
-            if (orderAgg.type.name === 'count') {
+            if (!orderAgg || orderAgg.type.name === 'count') {
               order._count = dir;
               return;
             }
