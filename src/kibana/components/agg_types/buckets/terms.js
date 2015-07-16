@@ -112,7 +112,7 @@ define(function (require) {
               if (!orderBy && prevOrderBy === INIT) {
                 // abort until we get the responseValueAggs
                 if (!$scope.responseValueAggs) return;
-                params.orderBy = (_.first($scope.responseValueAggs) || { id: 'custom' } || {id: 'x_axis'}).id;
+                params.orderBy = (_.first($scope.responseValueAggs) || { id: 'custom' } || {id: '_term'}).id;
                 return;
               }
 
