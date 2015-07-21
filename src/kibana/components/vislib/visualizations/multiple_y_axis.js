@@ -71,6 +71,7 @@ define(function (require) {
       var color = this.handler.data.getColorFunc();
       var xScale = this.handler.xAxis.xScale;
       var yScale = this.handler.yAxis.yScale;
+      var secondaryYScale = this.handler.secondaryYAxis.yScale;
       var ordered = this.handler.data.get('ordered');
       var tooltip = this.tooltip;
       var isTooltip = this._attr.addTooltip;
@@ -108,8 +109,12 @@ define(function (require) {
         return xScale(d.x) + xScale.rangeBand() / 2;
       }
 
-      function cy(d) {
-        return yScale(d.y);
+      function cy(d)  {
+        if (d.belongsToSecondaryYAxis) {
+          return secondaryYScale(d.y);
+        } else {
+          return yScale(d.y);
+        }
       }
 
       function cColor(d) {
@@ -179,6 +184,7 @@ define(function (require) {
       var self = this;
       var xScale = this.handler.xAxis.xScale;
       var yScale = this.handler.yAxis.yScale;
+      var secondaryYScale = this.handler.secondaryYAxis.yScale;
       var xAxisFormatter = this.handler.data.get('xAxisFormatter');
       var color = this.handler.data.getColorFunc();
       var ordered = this.handler.data.get('ordered');
@@ -192,7 +198,12 @@ define(function (require) {
         return xScale(d.x) + xScale.rangeBand() / 2;
       })
       .y(function y(d) {
-        return yScale(d.y);
+        if (d.belongsToSecondaryYAxis) {
+          return secondaryYScale(d.y);
+        } else {
+          return yScale(d.y);
+        }
+
       });
       var lines;
 
@@ -286,7 +297,8 @@ define(function (require) {
                 _input: e,
                 label: label,
                 x: self._attr.xValue.call(d.values, e, i),
-                y: self._attr.yValue.call(d.values, e, i)
+                y: self._attr.yValue.call(d.values, e, i),
+                belongsToSecondaryYAxis: e.belongsToSecondaryYAxis
               };
             });
           });

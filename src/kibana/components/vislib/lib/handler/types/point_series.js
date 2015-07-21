@@ -6,6 +6,7 @@ define(function (require) {
     var Legend = Private(require('components/vislib/lib/legend'));
     var XAxis = Private(require('components/vislib/lib/x_axis'));
     var YAxis = Private(require('components/vislib/lib/y_axis'));
+    var SecondaryYAxis = Private(require('components/vislib/lib/secondary_y_axis'));
     var AxisTitle = Private(require('components/vislib/lib/axis_title'));
     var ChartTitle = Private(require('components/vislib/lib/chart_title'));
     var Alerts = Private(require('components/vislib/lib/alerts'));
@@ -22,13 +23,13 @@ define(function (require) {
       return function (vis) {
         var isUserDefinedYAxis = vis._attr.setYExtents;
         var data;
+        var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
 
         if (opts.zeroFill) {
-          data = new Data(injectZeros(vis.data), vis._attr);
+          data = new Data(injectZeros(vis.data), vis._attr, yAxisStrategy);
         } else {
-          data = new Data(vis.data, vis._attr);
+          data = new Data(vis.data, vis._attr, yAxisStrategy);
         }
-        var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
         var handlerOpts = {
           data: data,
           legend: new Legend(vis, vis.el, data.labels, data.color, vis._attr),
@@ -45,12 +46,21 @@ define(function (require) {
           alerts: new Alerts(vis, data, opts.alerts),
           yAxis: new YAxis({
             el   : vis.el,
-            yMin : isUserDefinedYAxis ? vis._attr.yAxis.min : data.getYMin(yAxisStrategy),
-            yMax : isUserDefinedYAxis ? vis._attr.yAxis.max : data.getYMax(yAxisStrategy),
+            yMin : isUserDefinedYAxis ? vis._attr.yAxis.min : data.getYMin(),
+            yMax : isUserDefinedYAxis ? vis._attr.yAxis.max : data.getYMax(),
             yAxisFormatter: data.get('yAxisFormatter'),
             _attr: vis._attr
           })
         };
+        if (vis._attr.multi_y) {
+          handlerOpts.secondaryYAxis = new SecondaryYAxis({
+            el    : vis.el,
+            yMin  : data.getSecondYMin(),
+            yMax  : data.getSecondYMax(),
+            yAxisFormatter: data.get('secondYAxisFormatter'),
+            _attr : vis._attr
+          });
+        }
         return new Handler(vis, handlerOpts);
       };
     }
@@ -74,8 +84,8 @@ define(function (require) {
             test: function (vis, data) {
               if (!data.shouldBeStacked() || data.maxNumberOfSeries() < 2) return;
               var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
-              var hasPos = data.getYMax(yAxisStrategy, data._getY) > 0;
-              var hasNeg = data.getYMin(yAxisStrategy, data._getY) < 0;
+              var hasPos = data.getYMax(data._getY) > 0;
+              var hasNeg = data.getYMin(data._getY) < 0;
               return (hasPos && hasNeg);
             }
           }

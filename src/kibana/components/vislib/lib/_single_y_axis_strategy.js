@@ -21,6 +21,10 @@ define(function (require) {
       .value();
     };
 
+    SingleYAxisStrategy.prototype.decorate = function (data) {
+      return data;
+    };
+
     /**
      * Returns the max Y axis value for a `series` array based on
      * a specified callback function (calculation).

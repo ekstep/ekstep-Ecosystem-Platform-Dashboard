@@ -35,6 +35,7 @@ define(function (require) {
       this.chartTitle = opts.chartTitle;
       this.axisTitle = opts.axisTitle;
       this.alerts = opts.alerts;
+      this.secondaryYAxis = opts.secondaryYAxis;
 
       if (this._attr.addLegend) {
         this.legend = opts.legend;
@@ -50,6 +51,7 @@ define(function (require) {
         this.alerts,
         this.xAxis,
         this.yAxis,
+        this.secondaryYAxis
       ], Boolean);
 
       // memoize so that the same function is returned every time,

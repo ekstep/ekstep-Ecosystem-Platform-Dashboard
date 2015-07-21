@@ -29,6 +29,16 @@ define(function (require) {
         .last().values;
     };
 
+    DualYAxisStrategy.prototype.decorate = function (data) {
+      if (data.series) {
+        var lastDataSeriesValues = _(data.series).last().values;
+        _.map(lastDataSeriesValues, function (value) {
+          value.belongsToSecondaryYAxis = true;
+        });
+      }
+      return data;
+    };
+
     /**
      * Returns the max Y axis value for a `series` array based on
      * a specified callback function (calculation).

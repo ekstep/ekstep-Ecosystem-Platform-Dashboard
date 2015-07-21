@@ -16,13 +16,14 @@ define(function (require) {
      * @param data {Object} Elasticsearch query results
      * @param attr {Object|*} Visualization options
      */
-    function Data(data, attr) {
+    function Data(data, attr, yAxisStrategy) {
       if (!(this instanceof Data)) {
         return new Data(data, attr);
       }
 
       var self = this;
       var offset;
+      this.yAxisStrategy = yAxisStrategy;
 
       if (attr.mode === 'stacked') {
         offset = 'zero';
@@ -34,7 +35,7 @@ define(function (require) {
         offset = attr.mode;
       }
 
-      this.data = data;
+      this.data = this.yAxisStrategy.decorate(data);
       this.type = this.getDataType();
 
       this.labels;
@@ -301,12 +302,12 @@ define(function (require) {
       return val;
     };
 
-    Data.prototype.getYMax = function (yAxisStrategy, getValue) {
-      return yAxisStrategy.getYMax(getValue, this.chartData(), this._attr);
+    Data.prototype.getYMax = function (getValue) {
+      return this.yAxisStrategy.getYMax(getValue, this.chartData(), this._attr);
     };
 
-    Data.prototype.getSecondYMax = function (yAxisStrategy, getValue) {
-      return yAxisStrategy.getSecondYMax(getValue, this.chartData(), this._attr);
+    Data.prototype.getSecondYMax = function (getValue) {
+      return this.yAxisStrategy.getSecondYMax(getValue, this.chartData(), this._attr);
     };
     /**
      * Calculates the lowest Y value across all charts, taking
@@ -318,12 +319,12 @@ define(function (require) {
      *                              be considered
      * @returns {Number} Min y axis value
      */
-    Data.prototype.getYMin = function (yAxisStrategy, getValue) {
-      return yAxisStrategy.getYMin(getValue, this.chartData(), this._attr);
+    Data.prototype.getYMin = function (getValue) {
+      return this.yAxisStrategy.getYMin(getValue, this.chartData(), this._attr);
     };
 
-    Data.prototype.getSecondYMin = function (yAxisStrategy, getValue) {
-      return yAxisStrategy.getSecondYMin(getValue, this.chartData(), this._attr);
+    Data.prototype.getSecondYMin = function (getValue) {
+      return this.yAxisStrategy.getSecondYMin(getValue, this.chartData(), this._attr);
     };
 
     /**
