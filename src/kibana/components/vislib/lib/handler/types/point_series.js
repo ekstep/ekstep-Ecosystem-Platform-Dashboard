@@ -9,6 +9,8 @@ define(function (require) {
     var AxisTitle = Private(require('components/vislib/lib/axis_title'));
     var ChartTitle = Private(require('components/vislib/lib/chart_title'));
     var Alerts = Private(require('components/vislib/lib/alerts'));
+    var SingleYAxisStrategy = Private(require('components/vislib/lib/_single_y_axis_strategy'));
+    var DualYAxisStrategy = Private(require('components/vislib/lib/_dual_y_axis_strategy'));
 
     /*
      * Create handlers for Area, Column, and Line charts which
@@ -26,8 +28,8 @@ define(function (require) {
         } else {
           data = new Data(vis.data, vis._attr);
         }
-
-        return new Handler(vis, {
+        var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
+        var handlerOpts = {
           data: data,
           legend: new Legend(vis, vis.el, data.labels, data.color, vis._attr),
           axisTitle: new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel')),
@@ -43,13 +45,13 @@ define(function (require) {
           alerts: new Alerts(vis, data, opts.alerts),
           yAxis: new YAxis({
             el   : vis.el,
-            yMin : isUserDefinedYAxis ? vis._attr.yAxis.min : data.getYMin(),
-            yMax : isUserDefinedYAxis ? vis._attr.yAxis.max : data.getYMax(),
+            yMin : isUserDefinedYAxis ? vis._attr.yAxis.min : data.getYMin(yAxisStrategy),
+            yMax : isUserDefinedYAxis ? vis._attr.yAxis.max : data.getYMax(yAxisStrategy),
             yAxisFormatter: data.get('yAxisFormatter'),
             _attr: vis._attr
           })
-        });
-
+        };
+        return new Handler(vis, handlerOpts);
       };
     }
 
@@ -71,9 +73,9 @@ define(function (require) {
                  'bar chart is recommended.',
             test: function (vis, data) {
               if (!data.shouldBeStacked() || data.maxNumberOfSeries() < 2) return;
-
-              var hasPos = data.getYMax(data._getY) > 0;
-              var hasNeg = data.getYMin(data._getY) < 0;
+              var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
+              var hasPos = data.getYMax(yAxisStrategy, data._getY) > 0;
+              var hasNeg = data.getYMin(yAxisStrategy, data._getY) < 0;
               return (hasPos && hasNeg);
             }
           }

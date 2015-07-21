@@ -24,6 +24,7 @@ define(function (require) {
           addTimeMarker: false,
           defaultYExtents: false,
           setYExtents: false,
+          multi_y: true,
           yAxis: {}
         },
         scales: ['linear', 'log', 'square root'],

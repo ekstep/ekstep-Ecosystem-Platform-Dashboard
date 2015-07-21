@@ -7,7 +7,6 @@ define(function (require) {
     var getLabels = Private(require('components/vislib/components/labels/labels'));
     var color = Private(require('components/vislib/components/color/color'));
     var errors = require('errors');
-
     /**
      * Provides an API for pulling values off the data
      * and calculating values using the data
@@ -289,42 +288,6 @@ define(function (require) {
     };
 
     /**
-     * Return an array of all value objects
-     * Pluck the data.series array from each data object
-     * Create an array of all the value objects from the series array
-     *
-     * @method flatten
-     * @returns {Array} Value objects
-     */
-    Data.prototype.flatten = function () {
-      return _(this.chartData())
-      .pluck('series')
-      .flatten()
-      .pluck('values')
-      .flatten()
-      .value();
-    };
-
-    /**
-     * Determines whether histogram charts should be stacked
-     * TODO: need to make this more generic
-     *
-     * @method shouldBeStacked
-     * @returns {boolean}
-     */
-    Data.prototype.shouldBeStacked = function () {
-      var isHistogram = (this._attr.type === 'histogram');
-      var isArea = (this._attr.type === 'area');
-      var isOverlapping = (this._attr.mode === 'overlap');
-      var grouped = (this._attr.mode === 'grouped');
-
-      var stackedHisto = isHistogram && !grouped;
-      var stackedArea = isArea && !isOverlapping;
-
-      return stackedHisto || stackedArea;
-    };
-
-    /**
      * Validates that the Y axis min value defined by user input
      * is a number.
      *
@@ -338,6 +301,13 @@ define(function (require) {
       return val;
     };
 
+    Data.prototype.getYMax = function (yAxisStrategy, getValue) {
+      return yAxisStrategy.getYMax(getValue, this.chartData(), this._attr);
+    };
+
+    Data.prototype.getSecondYMax = function (yAxisStrategy, getValue) {
+      return yAxisStrategy.getSecondYMax(getValue, this.chartData(), this._attr);
+    };
     /**
      * Calculates the lowest Y value across all charts, taking
      * stacking into consideration.
@@ -348,125 +318,12 @@ define(function (require) {
      *                              be considered
      * @returns {Number} Min y axis value
      */
-    Data.prototype.getYMin = function (getValue) {
-      var self = this;
-      var arr = [];
-
-      if (this._attr.mode === 'percentage' || this._attr.mode === 'wiggle' ||
-        this._attr.mode === 'silhouette') {
-        return 0;
-      }
-
-      var flat = this.flatten();
-      // if there is only one data point and its less than zero,
-      // return 0 as the yMax value.
-      if (!flat.length || flat.length === 1 && flat[0].y > 0) {
-        return 0;
-      }
-
-      var min = Infinity;
-
-      // for each object in the dataArray,
-      // push the calculated y value to the initialized array (arr)
-      _.each(this.chartData(), function (chart) {
-        var calculatedMin = self._getYExtent(chart, 'min', getValue);
-        if (!_.isUndefined(calculatedMin)) {
-          min = Math.min(min, calculatedMin);
-        }
-      });
-
-      return min;
+    Data.prototype.getYMin = function (yAxisStrategy, getValue) {
+      return yAxisStrategy.getYMin(getValue, this.chartData(), this._attr);
     };
 
-    /**
-     * Calculates the highest Y value across all charts, taking
-     * stacking into consideration.
-     *
-     * @method getYMax
-     * @param {function} [getValue] - optional getter that will receive a
-     *                              point and should return the value that should
-     *                              be considered
-     * @returns {Number} Max y axis value
-     */
-    Data.prototype.getYMax = function (getValue) {
-      var self = this;
-      var arr = [];
-
-      if (self._attr.mode === 'percentage') {
-        return 1;
-      }
-
-      var flat = this.flatten();
-      // if there is only one data point and its less than zero,
-      // return 0 as the yMax value.
-      if (!flat.length || flat.length === 1 && flat[0].y < 0) {
-        return 0;
-      }
-
-      var max = -Infinity;
-
-      // for each object in the dataArray,
-      // push the calculated y value to the initialized array (arr)
-      _.each(this.chartData(), function (chart) {
-        var calculatedMax = self._getYExtent(chart, 'max', getValue);
-        if (!_.isUndefined(calculatedMax)) {
-          max = Math.max(max, calculatedMax);
-        }
-      });
-
-      return max;
-    };
-
-    /**
-     * Calculates the stacked values for each data object
-     *
-     * @method stackData
-     * @param series {Array} Array of data objects
-     * @returns {*} Array of data objects with x, y, y0 keys
-     */
-    Data.prototype.stackData = function (series) {
-      // Should not stack values on line chart
-      if (this._attr.type === 'line') return series;
-      return this._attr.stack(series);
-    };
-
-    /**
-     * Returns the max Y axis value for a `series` array based on
-     * a specified callback function (calculation).
-     * @param {function} [getValue] - Optional getter that will be used to read
-     *                              values from points when calculating the extent.
-     *                              default is either this._getYStack or this.getY
-     *                              based on this.shouldBeStacked().
-     */
-    Data.prototype._getYExtent = function (chart, extent, getValue) {
-      if (this.shouldBeStacked()) {
-        this.stackData(_.pluck(chart.series, 'values'));
-        getValue = getValue || this._getYStack;
-      } else {
-        getValue = getValue || this._getY;
-      }
-
-      var points = chart.series
-      .reduce(function (points, series) {
-        return points.concat(series.values);
-      }, [])
-      .map(getValue);
-
-      return d3[extent](points);
-    };
-
-    /**
-     * Calculates the y stack value for each data object
-     */
-    Data.prototype._getYStack = function (d) {
-      return d.y0 + d.y;
-    };
-
-    /**
-     * Calculates the Y max value
-     */
-    Data.prototype._getY = function (d) {
-      return d.y;
+    Data.prototype.getSecondYMin = function (yAxisStrategy, getValue) {
+      return yAxisStrategy.getSecondYMin(getValue, this.chartData(), this._attr);
     };
 
     /**
