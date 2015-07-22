@@ -10,8 +10,8 @@ define(function (require) {
         // TODO: vis option should allow choosing this format
         chart.yAxisFormatter = y[0].agg.fieldFormatter();
         chart.yAxisLabel = ''; // use the legend
-        chart.secondYAxisFormatter = y[1].agg.fieldFormatter();
-        chart.secondYAxisLabel = '';
+        chart.secondYAxisFormatter = _(y).last().agg.fieldFormatter();
+        chart.secondYAxisLabel = _(y).last().col.title;
       } else {
         chart.yAxisFormatter = y.agg.fieldFormatter();
         chart.yAxisLabel = y.col.title;

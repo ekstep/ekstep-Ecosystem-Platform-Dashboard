@@ -499,6 +499,10 @@ define(function (require) {
       }
     };
 
+    Data.prototype.shouldBeStacked = function () {
+      return this.yAxisStrategy.shouldBeStacked(this._attr);
+    };
+
     /**
      * Calculates min and max values for all map data
      * series.rows is an array of arrays

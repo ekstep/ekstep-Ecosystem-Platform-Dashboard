@@ -30,7 +30,7 @@ define(function (require) {
      * @return {D3.UpdateSelection} Renders y axis to visualization
      */
     SecondaryYAxis.prototype.render = function () {
-      d3.select(this.el).selectAll('.y-axis-div').call(this.draw());
+      d3.select(this.el).selectAll('.secondary-y-axis-div').call(this.draw());
     };
 
     SecondaryYAxis.prototype._isPercentage = function () {
@@ -200,7 +200,6 @@ define(function (require) {
           var width = $(el).parent().width();
           var height = $(el).height();
           var adjustedHeight = height - margin.top - margin.bottom;
-          var widthOfChart = $('chart-wrapper').width();
 
           // Validate whether width and height are not 0 or `NaN`
           self.validateWidthandHeight(width, adjustedHeight);
@@ -210,7 +209,7 @@ define(function (require) {
           // The yAxis should not appear if mode is set to 'wiggle' or 'silhouette'
           if (!isWiggleOrSilhouette) {
             // Append svg and y axis
-            var svg = div.attr('style', 'margin-left: ' + widthOfChart + 'px')
+            var svg = div
             .append('svg')
             .attr('width', width)
             .attr('height', height);
@@ -225,7 +224,7 @@ define(function (require) {
               var cWidth = Math.max(width, container.getBBox().width);
               svg.attr('width', cWidth);
               svg.select('g')
-              .attr('transform', 'translate(' + (cWidth - 2) + ',' + margin.top + ')');
+              .attr('transform', 'translate( 0, ' + margin.top + ')');
             }
           }
         });

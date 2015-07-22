@@ -60,6 +60,7 @@ define(function (require) {
             yAxisFormatter: data.get('secondYAxisFormatter'),
             _attr : vis._attr
           });
+          handlerOpts.axisTitle = new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel'), data.get('secondYAxisLabel'));
         }
         return new Handler(vis, handlerOpts);
       };
