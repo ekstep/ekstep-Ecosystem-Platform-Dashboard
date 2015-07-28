@@ -15,7 +15,6 @@ define(function (require) {
       line: Private(require('components/vislib/visualizations/line_chart')),
       area: Private(require('components/vislib/visualizations/area_chart')),
       tile_map: Private(require('components/vislib/visualizations/tile_map')),
-      multi_y: Private(require('components/vislib/visualizations/multiple_y_axis'))
     };
   };
 

@@ -9,6 +9,7 @@ define(function (require) {
     var $ = require('jquery');
     var aggTypes = Private(require('components/agg_types/index'));
     var advancedToggleHtml = require('text!plugins/visualize/editor/advanced_toggle.html');
+    var secondaryYAxisHtml = require('text!plugins/visualize/editor/secondary_y_axis.html');
 
     var notify = new Notifier({
       location: 'visAggGroup'
@@ -18,22 +19,45 @@ define(function (require) {
       restrict: 'A',
       template: require('text!plugins/visualize/editor/agg.html'),
       require: 'form',
+      scope: false,
       link: function ($scope, $el, attrs, kbnForm) {
         $scope.$bind('outputAgg', 'outputVis.aggs.byId[agg.id]', $scope);
+        $scope.$bind('dual_y', 'attrs.dual_y');
         $scope.editorOpen = !!$scope.agg.brandNew;
+        if ($scope.agg.onSecondaryYAxis) {
+          $scope.dual_y = $scope.agg.id;
+        }
 
         $scope.$watch('editorOpen', function (open) {
           // make sure that all of the form inputs are "touched"
           // so that their errors propogate
           if (!open) kbnForm.$setTouched();
         });
-
         $scope.$watchMulti([
           '$index',
           'group.length'
         ], function () {
           $scope.aggIsTooLow = calcAggIsTooLow();
         });
+
+        $scope.$watch('dual_y', function updateAggs(newValue, oldValue) {
+          if (newValue) {
+            var requiredAgg = _.findWhere($scope.vis.aggs, {'id': $scope.agg.id});
+            if (newValue === $scope.agg.id) {
+              $scope.vis.dirty = true;
+              requiredAgg.onSecondaryYAxis = true;
+              $scope.vis.params.hasSecondaryYAxis = true;
+            } else {
+              requiredAgg.onSecondaryYAxis = false;
+            }
+          }
+        }, true);
+
+        $scope.canBeSecondaryYAxis = function () {
+          var isYAxisMetric = $scope.agg._opts.schema === 'metric' || $scope.agg._opts.schema.title === 'Y-Axis';
+          return $scope.agg.vis.type.name === 'line' && isYAxisMetric;
+        };
+
 
         /**
          * Describe the aggregation, for display in the collapsed agg header

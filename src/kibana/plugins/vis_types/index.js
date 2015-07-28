@@ -5,5 +5,4 @@ define(function (require) {
   visTypes.register(require('plugins/vis_types/vislib/pie'));
   visTypes.register(require('plugins/vis_types/vislib/area'));
   visTypes.register(require('plugins/vis_types/vislib/tile_map'));
-  visTypes.register(require('plugins/vis_types/vislib/multiple_y_axis'));
 });

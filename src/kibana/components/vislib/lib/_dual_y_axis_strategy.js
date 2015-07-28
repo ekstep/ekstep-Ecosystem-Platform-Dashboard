@@ -12,28 +12,37 @@ define(function (require) {
      * @method flatten
      * @returns {Array} Value objects
      */
-    DualYAxisStrategy.prototype._flatten = function (chartData) {
-      return _(chartData)
-      .pluck('series')
-      .flatten()
-      .initial()
-      .pluck('values')
-      .flatten()
-      .value();
-    };
-
-    DualYAxisStrategy.prototype._last = function (chartData) {
+    DualYAxisStrategy.prototype._primaryAxisFlatten = function (chartData) {
       return _(chartData)
         .pluck('series')
         .flatten()
-        .last().values;
+        .reject( function (series) {
+          return series.onSecondaryYAxis;
+        })
+        .pluck('values')
+        .flatten()
+        .value();
+    };
+
+    DualYAxisStrategy.prototype._secondaryAxisFlatten = function (chartData) {
+      return _(chartData)
+        .pluck('series')
+        .flatten()
+        .filter( function (series) {
+          return series.onSecondaryYAxis;
+        })
+        .pluck('values')
+        .flatten()
+        .value();
     };
 
     DualYAxisStrategy.prototype.decorate = function (data) {
       if (data.series) {
-        var lastDataSeriesValues = _(data.series).last().values;
-        _.map(lastDataSeriesValues, function (value) {
-          value.belongsToSecondaryYAxis = true;
+        _.map(data.series, function (series) {
+          var onSecondaryYAxis = series.onSecondaryYAxis;
+          _.map(series.values, function (value) {
+            value.belongsToSecondaryYAxis = onSecondaryYAxis;
+          });
         });
       }
       return data;
@@ -69,7 +78,7 @@ define(function (require) {
         return 1;
       }
 
-      var flat = this._flatten(chartData);
+      var flat = this._primaryAxisFlatten(chartData);
       // if there is only one data point and its less than zero,
       // return 0 as the yMax value.
       if (!flat.length || flat.length === 1 && flat[0].y < 0) {
@@ -101,7 +110,7 @@ define(function (require) {
         return 1;
       }
 
-      var flat = this._last(chartData);
+      var flat = this._secondaryAxisFlatten(chartData);
       // if there is only one data point and its less than zero,
       // return 0 as the yMax value.
       if (!flat.length || flat.length === 1 && flat[0].y < 0) {
@@ -132,7 +141,7 @@ define(function (require) {
         return 0;
       }
 
-      var flat = this._flatten(chartData);
+      var flat = this._primaryAxisFlatten(chartData);
       // if there is only one data point and its less than zero,
       // return 0 as the yMax value.
       if (!flat.length || flat.length === 1 && flat[0].y > 0) {
@@ -163,7 +172,7 @@ define(function (require) {
         return 0;
       }
 
-      var flat = this._last(chartData);
+      var flat = this._secondaryAxisFlatten(chartData);
       // if there is only one data point and its less than zero,
       // return 0 as the yMax value.
       if (!flat.length || flat.length === 1 && flat[0].y > 0) {

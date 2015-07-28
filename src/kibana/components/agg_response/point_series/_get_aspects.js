@@ -53,7 +53,16 @@ define(function (require) {
         aspects.x = fakeXAspect(vis);
       }
 
+      updateSecondaryYAxis(vis, aspects);
       return aspects;
     };
+
+    function updateSecondaryYAxis(vis, aspects) {
+      var editableAggs = vis.getEditableVis().aggs;
+
+      _.map(aspects.y, function updateOnSecondaryAxis(aspect) {
+        aspect.agg.onSecondaryYAxis = _.findWhere(editableAggs, {'id': aspect.agg.id}).onSecondaryYAxis;
+      });
+    }
   };
 });

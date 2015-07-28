@@ -9,6 +9,7 @@ define(function (require) {
     var aggTypes = Private(require('components/agg_types/index'));
     var aggSelectHtml = require('text!plugins/visualize/editor/agg_select.html');
     var advancedToggleHtml = require('text!plugins/visualize/editor/advanced_toggle.html');
+    var secondaryYAxisHtml = require('text!plugins/visualize/editor/secondary_y_axis.html');
     require('filters/match_any');
     require('plugins/visualize/editor/agg_param');
 

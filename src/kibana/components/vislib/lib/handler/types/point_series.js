@@ -23,7 +23,7 @@ define(function (require) {
       return function (vis) {
         var isUserDefinedYAxis = vis._attr.setYExtents;
         var data;
-        var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
+        var yAxisStrategy = vis._attr.hasSecondaryYAxis ? new DualYAxisStrategy() : new SingleYAxisStrategy();
 
         if (opts.zeroFill) {
           data = new Data(injectZeros(vis.data), vis._attr, yAxisStrategy);
@@ -50,9 +50,10 @@ define(function (require) {
             yMax : isUserDefinedYAxis ? vis._attr.yAxis.max : data.getYMax(),
             yAxisFormatter: data.get('yAxisFormatter'),
             _attr: vis._attr
-          })
+          }),
+          secondaryYAxis: new SecondaryYAxis({})
         };
-        if (vis._attr.multi_y) {
+        if (vis._attr.hasSecondaryYAxis) {
           handlerOpts.secondaryYAxis = new SecondaryYAxis({
             el    : vis.el,
             yMin  : data.getSecondYMin(),

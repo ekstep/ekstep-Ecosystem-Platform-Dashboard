@@ -13,7 +13,6 @@ define(function (require) {
       pie: Private(require('components/vislib/lib/handler/types/pie')),
       area: pointSeries.area,
       tile_map: Private(require('components/vislib/lib/handler/types/tile_map')),
-      multi_y: pointSeries.line
     };
   };
 });
