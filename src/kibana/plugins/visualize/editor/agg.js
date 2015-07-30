@@ -54,8 +54,11 @@ define(function (require) {
         }, true);
 
         $scope.canBeSecondaryYAxis = function () {
-          var isYAxisMetric = $scope.agg._opts.schema === 'metric' || $scope.agg._opts.schema.title === 'Y-Axis';
-          return $scope.agg.vis.type.name === 'line' && isYAxisMetric;
+          var schema = $scope.agg.schema;
+          var isYAxisMetric = schema.name === 'metric' && schema.title === 'Y-Axis';
+          var yAxisCount = $scope.stats.count;
+          var isLineGraph = $scope.vis.type.name === 'line';
+          return isLineGraph && isYAxisMetric && yAxisCount > 1;
         };
 
 

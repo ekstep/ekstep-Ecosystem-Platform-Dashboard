@@ -53,7 +53,10 @@ define(function (require) {
         aspects.x = fakeXAspect(vis);
       }
 
-      updateSecondaryYAxis(vis, aspects);
+      if (vis.params.hasSecondaryYAxis) {
+        updateSecondaryYAxis(vis, aspects);
+      }
+
       return aspects;
     };
 
