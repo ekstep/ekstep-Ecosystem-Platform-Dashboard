@@ -58,9 +58,9 @@ define(function (require) {
           var isYAxisMetric = schema.name === 'metric' && schema.title === 'Y-Axis';
           var yAxisCount = $scope.stats.count;
           var isLineGraph = $scope.vis.type.name === 'line';
-          return isLineGraph && isYAxisMetric && yAxisCount > 1;
+          var minYAxisCount = 1;
+          return isLineGraph && isYAxisMetric && yAxisCount > minYAxisCount;
         };
-
 
         /**
          * Describe the aggregation, for display in the collapsed agg header
@@ -82,6 +82,12 @@ define(function (require) {
 
         $scope.remove = function (agg) {
           var aggs = $scope.vis.aggs;
+          var yAxisCount = $scope.stats.count;
+          var minYAxisCount = 2;
+          if ($scope.stats.count <= minYAxisCount || agg.onSecondaryYAxis) {
+            $scope.vis.params.hasSecondaryYAxis = false;
+            $scope.dual_y = '';
+          }
 
           var index = aggs.indexOf(agg);
           if (index === -1) return notify.log('already removed');

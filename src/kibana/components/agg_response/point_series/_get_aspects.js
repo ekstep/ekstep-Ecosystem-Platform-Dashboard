@@ -64,7 +64,8 @@ define(function (require) {
       var editableAggs = vis.getEditableVis().aggs;
 
       _.map(aspects.y, function updateOnSecondaryAxis(aspect) {
-        aspect.agg.onSecondaryYAxis = _.findWhere(editableAggs, {'id': aspect.agg.id}).onSecondaryYAxis;
+        var aggId = aspect.agg.key ? aspect.agg.parentId : aspect.agg.id;
+        aspect.agg.onSecondaryYAxis = _.findWhere(editableAggs, {'id': aggId}).onSecondaryYAxis;
       });
     }
   };

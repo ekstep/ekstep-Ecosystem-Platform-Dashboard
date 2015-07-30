@@ -26,7 +26,8 @@ define(function (require) {
           var prefix = point.series ? point.series + ': ' : '';
           var seriesId = prefix + y.agg.id;
           var seriesLabel = prefix + y.col.title;
-          var onSecondaryYAxis = _.findWhere(editableAggs, {'id': y.agg.id}).onSecondaryYAxis;
+          var aggId = y.agg.key ? y.agg.parentId : y.agg.id;
+          var onSecondaryYAxis = _.findWhere(editableAggs, {'id': aggId}).onSecondaryYAxis;
 
           addToSiri(series, point, seriesId, seriesLabel, onSecondaryYAxis);
         });
