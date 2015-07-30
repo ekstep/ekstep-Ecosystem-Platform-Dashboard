@@ -22,8 +22,9 @@ define(function (require) {
       if (datedX) {
         setupOrderedDateXAxis(vis, chart);
       }
+      var requiredVis = vis.getEditableVis() ? vis.getEditableVis() : vis;
 
-      chart.series = getSeries(table.rows, chart, vis.getEditableVis().aggs);
+      chart.series = getSeries(table.rows, chart, requiredVis.aggs);
 
       delete chart.aspects;
       return chart;
