@@ -36,7 +36,9 @@ define(function (require) {
     AxisTitle.prototype.render = function () {
       d3.select(this.el).select('.x-axis-title').call(this.draw(this.xTitle));
       d3.select(this.el).select('.y-axis-title').call(this.draw(this.yTitle));
-      d3.select(this.el).select('.secondary-y-axis-title').call(this.draw(this.secondaryYTitle));
+      if (this.secondaryYTitle) {
+        d3.select(this.el).select('.secondary-y-axis-title').call(this.draw(this.secondaryYTitle));
+      }
     };
 
     /**

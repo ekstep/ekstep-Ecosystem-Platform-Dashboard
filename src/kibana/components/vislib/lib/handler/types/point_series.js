@@ -22,17 +22,35 @@ define(function (require) {
       return function (vis) {
         var isUserDefinedYAxis = vis._attr.setYExtents;
         var data;
-        var yAxisStrategy = vis._attr.hasSecondaryYAxis ? new DualYAxisStrategy() : new SingleYAxisStrategy();
-
+        var yAxisStrategy = vis.get('hasSecondaryYAxis') ? new DualYAxisStrategy() : new SingleYAxisStrategy();
+        var secondaryYAxis;
+        var axisTitle;
         if (opts.zeroFill) {
           data = new Data(injectZeros(vis.data), vis._attr, yAxisStrategy);
         } else {
           data = new Data(vis.data, vis._attr, yAxisStrategy);
         }
+
+        if (vis.get('hasSecondaryYAxis')) {
+          secondaryYAxis = new YAxis({
+            el    : vis.el,
+            yMin  : data.getSecondYMin(),
+            yMax  : data.getSecondYMax(),
+            yAxisFormatter: data.get('secondYAxisFormatter'),
+            _attr: vis._attr,
+            orientation: 'right',
+            yAxisDiv: 'secondary-y-axis-div'
+          });
+          axisTitle = new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel'), data.get('secondYAxisLabel'));
+        } else {
+          secondaryYAxis = new YAxis({});
+          axisTitle = new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel'));
+        }
+
         var handlerOpts = {
           data: data,
           legend: new Legend(vis, vis.el, data.labels, data.color, vis._attr),
-          axisTitle: new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel')),
+          axisTitle: axisTitle,
           chartTitle: new ChartTitle(vis.el),
           xAxis: new XAxis({
             el                : vis.el,
@@ -52,20 +70,8 @@ define(function (require) {
             orientation: 'left',
             yAxisDiv: 'y-axis-div'
           }),
-          secondaryYAxis: new YAxis({})
+          secondaryYAxis: secondaryYAxis
         };
-        if (vis._attr.hasSecondaryYAxis) {
-          handlerOpts.secondaryYAxis = new YAxis({
-            el    : vis.el,
-            yMin  : data.getSecondYMin(),
-            yMax  : data.getSecondYMax(),
-            yAxisFormatter: data.get('secondYAxisFormatter'),
-            _attr: vis._attr,
-            orientation: 'right',
-            yAxisDiv: 'secondary-y-axis-div'
-          });
-          handlerOpts.axisTitle = new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel'), data.get('secondYAxisLabel'));
-        }
         return new Handler(vis, handlerOpts);
       };
     }
