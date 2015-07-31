@@ -6,7 +6,6 @@ define(function (require) {
     var Legend = Private(require('components/vislib/lib/legend'));
     var XAxis = Private(require('components/vislib/lib/x_axis'));
     var YAxis = Private(require('components/vislib/lib/y_axis'));
-    var SecondaryYAxis = Private(require('components/vislib/lib/secondary_y_axis'));
     var AxisTitle = Private(require('components/vislib/lib/axis_title'));
     var ChartTitle = Private(require('components/vislib/lib/chart_title'));
     var Alerts = Private(require('components/vislib/lib/alerts'));
@@ -49,17 +48,21 @@ define(function (require) {
             yMin : isUserDefinedYAxis ? vis._attr.yAxis.min : data.getYMin(),
             yMax : isUserDefinedYAxis ? vis._attr.yAxis.max : data.getYMax(),
             yAxisFormatter: data.get('yAxisFormatter'),
-            _attr: vis._attr
+            _attr: vis._attr,
+            orientation: 'left',
+            yAxisDiv: 'y-axis-div'
           }),
-          secondaryYAxis: new SecondaryYAxis({})
+          secondaryYAxis: new YAxis({})
         };
         if (vis._attr.hasSecondaryYAxis) {
-          handlerOpts.secondaryYAxis = new SecondaryYAxis({
+          handlerOpts.secondaryYAxis = new YAxis({
             el    : vis.el,
             yMin  : data.getSecondYMin(),
             yMax  : data.getSecondYMax(),
             yAxisFormatter: data.get('secondYAxisFormatter'),
-            _attr : vis._attr
+            _attr: vis._attr,
+            orientation: 'right',
+            yAxisDiv: 'secondary-y-axis-div'
           });
           handlerOpts.axisTitle = new AxisTitle(vis.el, data.get('xAxisLabel'), data.get('yAxisLabel'), data.get('secondYAxisLabel'));
         }

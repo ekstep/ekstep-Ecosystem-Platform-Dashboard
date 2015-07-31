@@ -43,7 +43,6 @@ define(function (require) {
           if (newValue) {
             var requiredAgg = _.findWhere($scope.vis.aggs, {'id': $scope.agg.id});
             if (newValue === $scope.agg.id) {
-              $scope.vis.dirty = true;
               requiredAgg.onSecondaryYAxis = true;
               $scope.vis.params.hasSecondaryYAxis = true;
             } else {
