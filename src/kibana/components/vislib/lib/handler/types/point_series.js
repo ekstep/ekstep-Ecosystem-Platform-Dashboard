@@ -94,7 +94,6 @@ define(function (require) {
                  'bar chart is recommended.',
             test: function (vis, data) {
               if (!data.shouldBeStacked() || data.maxNumberOfSeries() < 2) return;
-              var yAxisStrategy = vis._attr.multi_y ? new DualYAxisStrategy() : new SingleYAxisStrategy();
               var hasPos = data.getYMax(data._getY) > 0;
               var hasNeg = data.getYMin(data._getY) < 0;
               return (hasPos && hasNeg);

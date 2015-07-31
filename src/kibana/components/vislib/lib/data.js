@@ -15,6 +15,7 @@ define(function (require) {
      * @constructor
      * @param data {Object} Elasticsearch query results
      * @param attr {Object|*} Visualization options
+     * @param yAxisStrategy {Object} Strategy for single & dual y-axis
      */
     function Data(data, attr, yAxisStrategy) {
       if (!(this instanceof Data)) {
@@ -35,6 +36,7 @@ define(function (require) {
         offset = attr.mode;
       }
 
+      //updating each series point if it belongs to secondary axis
       this.data = this.yAxisStrategy.decorate(data);
       this.type = this.getDataType();
 
@@ -74,6 +76,9 @@ define(function (require) {
       }
     }
 
+    /**
+     * Updates row or coloumns or series labels for y-axis
+     */
     Data.prototype._updateData = function () {
       if (this.data.rows) {
         _.map(this.data.rows, this._updateDataSeriesLabel, this);
@@ -84,6 +89,9 @@ define(function (require) {
       }
     };
 
+    /**
+     * Updates the label in series for y-axis
+     */
     Data.prototype._updateDataSeriesLabel = function (eachData) {
       if (eachData.series) {
         eachData.series[0].label = this.get('yAxisLabel');
@@ -302,16 +310,30 @@ define(function (require) {
       return val;
     };
 
+    /**
+     * Return the highest Y value for the primary Y Axis
+     * @method getYMax
+     * @param {function} [getValue] - optional getter that will receive a
+     *                              point and should return the value that should
+     *                              be considered
+     */
     Data.prototype.getYMax = function (getValue) {
       return this.yAxisStrategy.getYMax(getValue, this.chartData(), this._attr);
     };
 
+    /**
+     * Return the highest Y value for the secondary Y Axis
+     * @method getSecondYMax
+     * @param {function} [getValue] - optional getter that will receive a
+     *                              point and should return the value that should
+     *                              be considered
+     */
     Data.prototype.getSecondYMax = function (getValue) {
       return this.yAxisStrategy.getSecondYMax(getValue, this.chartData(), this._attr);
     };
     /**
-     * Calculates the lowest Y value across all charts, taking
-     * stacking into consideration.
+     * Calculates the lowest Y value across charts, taking
+     * stacking into consideration for primary axis.
      *
      * @method getYMin
      * @param {function} [getValue] - optional getter that will receive a
@@ -323,6 +345,15 @@ define(function (require) {
       return this.yAxisStrategy.getYMin(getValue, this.chartData(), this._attr);
     };
 
+    /**
+     * Calculates the lowest Y value across charts for secondary axis.
+     *
+     * @method getSecondYMin
+     * @param {function} [getValue] - optional getter that will receive a
+     *                              point and should return the value that should
+     *                              be considered
+     * @returns {Number} Min y axis value
+     */
     Data.prototype.getSecondYMin = function (getValue) {
       return this.yAxisStrategy.getSecondYMin(getValue, this.chartData(), this._attr);
     };

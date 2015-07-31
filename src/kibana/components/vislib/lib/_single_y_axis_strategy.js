@@ -28,10 +28,13 @@ define(function (require) {
     /**
      * Returns the max Y axis value for a `series` array based on
      * a specified callback function (calculation).
+     * @param chart {Object} - data for each chart
+     * @param extent {String} - max/min
      * @param {function} [getValue] - Optional getter that will be used to read
      *                              values from points when calculating the extent.
      *                              default is either this._getYStack or this.getY
      *                              based on this.shouldBeStacked().
+     * @param attr {Object} - properties for the chart
      */
     SingleYAxisStrategy.prototype._getYExtent = function (chart, extent, getValue, attr) {
       if (this.shouldBeStacked(attr)) {
@@ -104,6 +107,8 @@ define(function (require) {
      * @param {function} [getValue] - optional getter that will receive a
      *                              point and should return the value that should
      *                              be considered
+     * @param chartData {Array} of actual y data value objects
+     * @param attr {Object} mode of the graph
      * @returns {Number} Max y axis value
      */
     SingleYAxisStrategy.prototype.getYMax = function (getValue, chartData, attr) {
@@ -135,6 +140,18 @@ define(function (require) {
       return max;
     };
 
+    /**
+     * Calculates the lowest Y value across all charts, taking
+     * stacking into consideration.
+     *
+     * @method getYMin
+     * @param {function} [getValue] - optional getter that will receive a
+     *                              point and should return the value that should
+     *                              be considered
+     * @param chartData {Array} of actual y data value objects
+     * @param attr {Object} mode of the graph
+     * @returns {Number} Min y axis value
+     */
     SingleYAxisStrategy.prototype.getYMin = function (getValue, chartData, attr) {
       var self = this;
       var arr = [];
