@@ -34,8 +34,8 @@ define(function (require) {
         if (vis.get('hasSecondaryYAxis')) {
           secondaryYAxis = new YAxis({
             el    : vis.el,
-            yMin  : data.getSecondYMin(),
-            yMax  : data.getSecondYMax(),
+            yMin : isUserDefinedYAxis ? vis._attr.secondaryYAxis.min : data.getSecondYMin(),
+            yMax : isUserDefinedYAxis ? vis._attr.secondaryYAxis.max : data.getSecondYMax(),
             yAxisFormatter: data.get('secondYAxisFormatter'),
             _attr: vis._attr,
             orientation: 'right',
