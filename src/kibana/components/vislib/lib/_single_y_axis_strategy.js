@@ -22,6 +22,13 @@ define(function (require) {
     };
 
     SingleYAxisStrategy.prototype.decorate = function (data) {
+      if (data.series) {
+        _.map(data.series, function (series) {
+          _.map(series.values, function (value) {
+            value.belongsToSecondaryYAxis = false;
+          });
+        });
+      }
       return data;
     };
 

@@ -297,7 +297,7 @@ define(function (require) {
                 label: label,
                 x: self._attr.xValue.call(d.values, e, i),
                 y: self._attr.yValue.call(d.values, e, i),
-                belongsToSecondaryYAxis: d.onSecondaryYAxis
+                belongsToSecondaryYAxis: e.belongsToSecondaryYAxis
               };
             });
           });
