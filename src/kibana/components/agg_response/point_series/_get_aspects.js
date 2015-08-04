@@ -53,21 +53,7 @@ define(function (require) {
         aspects.x = fakeXAspect(vis);
       }
 
-      if (vis.params.hasSecondaryYAxis) {
-        updateSecondaryYAxis(vis, aspects);
-      }
-
       return aspects;
     };
-
-    function updateSecondaryYAxis(vis, aspects) {
-      var requiredVis = vis.getEditableVis() ? vis.getEditableVis() : vis;
-      var aggs = requiredVis.aggs;
-
-      _.map(aspects.y, function updateOnSecondaryAxis(aspect) {
-        var aggId = aspect.agg.key ? aspect.agg.parentId : aspect.agg.id;
-        aspect.agg.onSecondaryYAxis = _.findWhere(aggs, {'id': aggId}).onSecondaryYAxis;
-      });
-    }
   };
 });

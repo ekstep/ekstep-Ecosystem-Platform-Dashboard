@@ -87,11 +87,15 @@ define(function (require) {
         .to.be.an('array')
         .and.to.have.length(2);
 
+      expect(series[0].onSecondaryYAxis).to.be(true);
+      expect(series[1].onSecondaryYAxis).to.be(false);
+
       series.forEach(function (siri, i) {
         expect(siri)
           .to.be.an('object')
           .and.have.property('label', '' + i)
-          .and.have.property('values');
+          .and.have.property('values')
+          .and.have.property('onSecondaryYAxis');
 
         expect(siri.values)
           .to.be.an('array')
