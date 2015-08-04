@@ -54,7 +54,7 @@ define(function (require) {
                     {
                       type: 'div',
                       class: 'y-axis-div-wrapper',
-                      splits: new YAxisSplit('y-axis-div').build()
+                      splits: new YAxisSplit('y-axis-div', false).build()
                     }
                   ]
                 },
@@ -115,7 +115,7 @@ define(function (require) {
                     {
                       type: 'div',
                       class: 'secondary-y-axis-div-wrapper',
-                      splits: new YAxisSplit('secondary-y-axis-div').build()
+                      splits: new YAxisSplit('secondary-y-axis-div', true).build()
                     },
                     {
                       type: 'div',

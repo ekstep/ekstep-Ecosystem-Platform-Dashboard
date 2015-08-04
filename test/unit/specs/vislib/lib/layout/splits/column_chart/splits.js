@@ -257,7 +257,7 @@ define(function (require) {
               .attr('class', 'rows')
               .datum({ rows: [{}, {}] });
 
-            d3.select('.rows').call(new YAxisSplit('y-axis-div').build());
+            d3.select('.rows').call(new YAxisSplit('y-axis-div', false).build());
 
             divs = d3.selectAll('.y-axis-div')[0];
           });
