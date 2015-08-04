@@ -3,8 +3,12 @@ define(function (require) {
   var _ = require('lodash');
 
   var Data;
+  var SingleYAxisStrategy;
+  var DualYAxisStrategy;
   var dataSeries = require('vislib_fixtures/mock_data/date_histogram/_series');
+  var dualAxisDataSeries = require('vislib_fixtures/mock_data/date_histogram/_dual_axis_series');
   var dataSeriesNeg = require('vislib_fixtures/mock_data/date_histogram/_series_neg');
+  var dualAxisDataSeriesNeg = require('vislib_fixtures/mock_data/date_histogram/_dual_axis_series_neg');
   var dataStacked = require('vislib_fixtures/mock_data/stacked/_stacked');
 
   var seriesData = {
@@ -107,6 +111,8 @@ define(function (require) {
       module('DataFactory');
 
       inject(function (Private) {
+        SingleYAxisStrategy = Private(require('components/vislib/lib/_single_y_axis_strategy'));
+        DualYAxisStrategy = Private(require('components/vislib/lib/_dual_y_axis_strategy'));
         Data = Private(require('components/vislib/lib/data'));
       });
     });
@@ -117,8 +123,56 @@ define(function (require) {
       });
 
       it('should return an object', function () {
-        var rowIn = new Data(rowsData, {});
+        var rowIn = new Data(rowsData, {}, new SingleYAxisStrategy());
         expect(_.isObject(rowIn)).to.be(true);
+      });
+
+      it('should not decorate the values if there is no secondary Axis', function () {
+        var seriesDataWithoutLabelInSeries = {
+          'label': '',
+          'series': [
+            {
+              'label': '',
+              'values': [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 3}]
+            },
+            {
+              'values': [{x:10, y:11}, {x:11, y:12}, {x:12, y:13}]
+            }
+          ],
+          'yAxisLabel': 'customLabel'
+        };
+        var modifiedData = new Data(seriesDataWithoutLabelInSeries, {}, new SingleYAxisStrategy());
+        _.map(modifiedData.data.series[0].values, function (value) {
+          expect(value.belongsToSecondaryYAxis).to.be(undefined);
+        });
+        _.map(modifiedData.data.series[1].values, function (value) {
+          expect(value.belongsToSecondaryYAxis).to.be(undefined);
+        });
+      });
+
+      it('should decorate the values if it belongs to secondary Axis', function () {
+        var seriesDataWithoutLabelInSeries = {
+          'label': '',
+          'series': [
+            {
+              'label': '',
+              'onSecondaryYAxis': true,
+              'values': [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 3}]
+            },
+            {
+              'onSecondaryYAxis': false,
+              'values': [{x:10, y:11}, {x:11, y:12}, {x:12, y:13}]
+            }
+          ],
+          'yAxisLabel': 'customLabel'
+        };
+        var modifiedData = new Data(seriesDataWithoutLabelInSeries, {}, new DualYAxisStrategy());
+        _.map(modifiedData.data.series[0].values, function (value) {
+          expect(value.belongsToSecondaryYAxis).to.be(true);
+        });
+        _.map(modifiedData.data.series[1].values, function (value) {
+          expect(value.belongsToSecondaryYAxis).to.be(false);
+        });
       });
 
       it('should update label in series data', function () {
@@ -132,7 +186,7 @@ define(function (require) {
           ],
           'yAxisLabel': 'customLabel'
         };
-        var modifiedData = new Data(seriesDataWithoutLabelInSeries, {});
+        var modifiedData = new Data(seriesDataWithoutLabelInSeries, {}, new SingleYAxisStrategy());
         expect(modifiedData.data.series[0].label).to.be('customLabel');
       });
 
@@ -162,7 +216,7 @@ define(function (require) {
           ],
         };
 
-        var modifiedData = new Data(seriesDataWithoutLabelInRow, {});
+        var modifiedData = new Data(seriesDataWithoutLabelInRow, {}, new SingleYAxisStrategy());
         expect(modifiedData.data.rows[0].series[0].label).to.be('customLabel');
         expect(modifiedData.data.rows[1].series[0].label).to.be('customLabel');
       });
@@ -194,7 +248,7 @@ define(function (require) {
           'yAxisLabel': 'customLabel'
         };
 
-        var modifiedData = new Data(seriesDataWithoutLabelInRow, {});
+        var modifiedData = new Data(seriesDataWithoutLabelInRow, {}, new SingleYAxisStrategy());
         expect(modifiedData.data.columns[0].series[0].label).to.be('customLabel');
         expect(modifiedData.data.columns[1].series[0].label).to.be('customLabel');
       });
@@ -214,7 +268,7 @@ define(function (require) {
       };
 
       beforeEach(function () {
-        data = new Data(pieData, {});
+        data = new Data(pieData, {}, new SingleYAxisStrategy());
         data._removeZeroSlices(pieData.slices);
       });
 
@@ -272,9 +326,9 @@ define(function (require) {
       var minValueStacked = 15;
 
       beforeEach(function () {
-        visData = new Data(dataSeries, {});
-        visDataNeg = new Data(dataSeriesNeg, {});
-        visDataStacked = new Data(dataStacked, { type: 'histogram' });
+        visData = new Data(dataSeries, {}, new SingleYAxisStrategy());
+        visDataNeg = new Data(dataSeriesNeg, {}, new SingleYAxisStrategy());
+        visDataStacked = new Data(dataStacked, { type: 'histogram' }, new SingleYAxisStrategy());
       });
 
       // The first value in the time series is less than the min date in the
@@ -300,6 +354,32 @@ define(function (require) {
       });
     });
 
+    describe('getSecondYMin method', function () {
+      var visData;
+      var visDataNeg;
+      var visDataStacked;
+      var minValue = 4;
+      var secondMinValue = 400;
+      var minValueNeg = -41;
+      var secondMinValueNeg = -4100;
+
+      beforeEach(function () {
+        visData = new Data(dualAxisDataSeries, {}, new DualYAxisStrategy());
+        visDataNeg = new Data(dualAxisDataSeriesNeg, {}, new DualYAxisStrategy());
+      });
+
+      // The first value in the time series is less than the min date in the
+      // date range. It also has the largest y value. This value should be excluded
+      // when calculating the Y max value since it falls outside of the range.
+      it('should return the Y domain min values', function () {
+        expect(visData.getYMin()).to.be(minValue);
+        expect(visData.getSecondYMin()).to.be(secondMinValue);
+        expect(visDataNeg.getYMin()).to.be(minValueNeg);
+        expect(visDataNeg.getSecondYMin()).to.be(secondMinValueNeg);
+      });
+
+    });
+
     describe('getYMax method', function () {
       var visData;
       var visDataNeg;
@@ -309,9 +389,9 @@ define(function (require) {
       var maxValueStacked = 115;
 
       beforeEach(function () {
-        visData = new Data(dataSeries, {});
-        visDataNeg = new Data(dataSeriesNeg, {});
-        visDataStacked = new Data(dataStacked, { type: 'histogram' });
+        visData = new Data(dataSeries, {}, new SingleYAxisStrategy());
+        visDataNeg = new Data(dataSeriesNeg, {}, new SingleYAxisStrategy());
+        visDataStacked = new Data(dataStacked, { type: 'histogram' }, new SingleYAxisStrategy());
       });
 
       // The first value in the time series is less than the min date in the
@@ -335,6 +415,33 @@ define(function (require) {
         var multiplier = 13.2;
         expect(visData.getYMax(function (d) { return d.y * multiplier; })).to.be(realMax * multiplier);
       });
+    });
+
+    describe('getSecondYMax method', function () {
+      var visData;
+      var visDataNeg;
+      var visDataStacked;
+      var maxValue = 41;
+      var secondMaxValue = 4100;
+      var maxValueNeg = -4;
+      var secondMaxValueNeg = -400;
+      var maxValueStacked = 115;
+
+      beforeEach(function () {
+        visData = new Data(dualAxisDataSeries, {}, new DualYAxisStrategy());
+        visDataNeg = new Data(dualAxisDataSeriesNeg, {}, new DualYAxisStrategy());
+      });
+
+      // The first value in the time series is less than the min date in the
+      // date range. It also has the largest y value. This value should be excluded
+      // when calculating the Y max value since it falls outside of the range.
+      it('should return the Y domain min values', function () {
+        expect(visData.getYMax()).to.be(maxValue);
+        expect(visData.getSecondYMax()).to.be(secondMaxValue);
+        expect(visDataNeg.getYMax()).to.be(maxValueNeg);
+        expect(visDataNeg.getSecondYMax()).to.be(secondMaxValueNeg);
+      });
+
     });
 
   });

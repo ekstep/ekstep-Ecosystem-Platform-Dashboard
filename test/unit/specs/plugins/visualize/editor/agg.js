@@ -57,6 +57,10 @@ define(function (require) {
         id: '2',
         schema: makeConfig('radius')
       }];
+      $parentScope.stats = { count: 2 };
+      $parentScope.vis = {
+        type: { name: 'histogram' }
+      };
     });
     beforeEach(inject(function ($rootScope, $compile) {
       // share the scope

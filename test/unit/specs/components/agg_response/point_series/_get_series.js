@@ -33,7 +33,7 @@ define(function (require) {
         }
       };
 
-      var series = getSeries(rows, chart);
+      var series = getSeries(rows, chart, {});
 
       expect(series)
         .to.be.an('array')
@@ -76,7 +76,12 @@ define(function (require) {
         }
       };
 
-      var series = getSeries(rows, chart);
+      var aggs = [
+        { id: 1, onSecondaryYAxis: true  },
+        { id: 2, onSecondaryYAxis: false }
+      ];
+
+      var series = getSeries(rows, chart, aggs);
 
       expect(series)
         .to.be.an('array')
@@ -120,7 +125,7 @@ define(function (require) {
         }
       };
 
-      var series = getSeries(rows, chart);
+      var series = getSeries(rows, chart, {});
 
       expect(series)
         .to.be.an('array')
@@ -165,7 +170,13 @@ define(function (require) {
         }
       };
 
-      var series = getSeries(rows, chart);
+      var aggs = [
+        { id: 1, onSecondaryYAxis: true  },
+        { id: 2, onSecondaryYAxis: false }
+      ];
+
+
+      var series = getSeries(rows, chart, aggs);
 
       expect(series)
         .to.be.an('array')
@@ -215,7 +226,13 @@ define(function (require) {
         }
       };
 
-      var series = getSeries(rows, chart);
+      var aggs = [
+        { id: 1, onSecondaryYAxis: true  },
+        { id: 2, onSecondaryYAxis: false }
+      ];
+
+
+      var series = getSeries(rows, chart, aggs);
       expect(series[0]).to.have.property('label', '0: 0');
       expect(series[1]).to.have.property('label', '0: 1');
       expect(series[2]).to.have.property('label', '1: 0');
@@ -228,7 +245,7 @@ define(function (require) {
         y.i = i;
       });
 
-      var series2 = getSeries(rows, chart);
+      var series2 = getSeries(rows, chart, aggs);
       expect(series2[0]).to.have.property('label', '0: 1');
       expect(series2[1]).to.have.property('label', '0: 0');
       expect(series2[2]).to.have.property('label', '1: 1');

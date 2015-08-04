@@ -5,6 +5,7 @@ define(function (require) {
 
   var YAxis;
   var Data;
+  var SingleYAxisStrategy;
   var el;
   var buildYAxis;
   var yAxis;
@@ -69,7 +70,7 @@ define(function (require) {
 
     var dataObj = new Data(data, {
       defaultYMin: true
-    });
+    }, new SingleYAxisStrategy());
 
     buildYAxis = function (params) {
       return new YAxis(_.merge({}, params, {
@@ -95,6 +96,7 @@ define(function (require) {
 
     beforeEach(inject(function (Private, _d3_) {
       d3Provider = _d3_;
+      SingleYAxisStrategy = Private(require('components/vislib/lib/_single_y_axis_strategy'));
       Data = Private(require('components/vislib/lib/data'));
       YAxis = Private(require('components/vislib/lib/y_axis'));
 

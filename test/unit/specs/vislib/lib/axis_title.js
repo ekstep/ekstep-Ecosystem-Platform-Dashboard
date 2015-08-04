@@ -8,6 +8,7 @@ define(function (require) {
   describe('Vislib AxisTitle Class Test Suite', function () {
     var AxisTitle;
     var Data;
+    var SingleYAxisStrategy;
     var axisTitle;
     var el;
     var dataObj;
@@ -80,6 +81,7 @@ define(function (require) {
       inject(function (d3, Private) {
         AxisTitle = Private(require('components/vislib/lib/axis_title'));
         Data = Private(require('components/vislib/lib/data'));
+        SingleYAxisStrategy = Private(require('components/vislib/lib/_single_y_axis_strategy'));
 
         el = d3.select('body').append('div')
           .attr('class', 'vis-wrapper');
@@ -95,7 +97,7 @@ define(function (require) {
           .style('width', '20px');
 
 
-        dataObj = new Data(data, {});
+        dataObj = new Data(data, {}, new SingleYAxisStrategy());
         xTitle = dataObj.get('xAxisLabel');
         yTitle = dataObj.get('yAxisLabel');
         axisTitle = new AxisTitle($('.vis-wrapper')[0], xTitle, yTitle);
