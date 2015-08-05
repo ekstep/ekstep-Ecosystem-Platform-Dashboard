@@ -82,7 +82,10 @@ define(function (require) {
           var aggs = $scope.vis.aggs;
           var yAxisCount = $scope.stats.count;
           var minYAxisCount = 2;
-          if ($scope.stats.count <= minYAxisCount || agg.onSecondaryYAxis) {
+          var schema = $scope.agg.schema;
+          var isYAxisMetric = schema.name === 'metric' && schema.title === 'Y-Axis';
+          var doesNotHaveMinimumYAxisAfterRemoval = isYAxisMetric && $scope.stats.count <= minYAxisCount;
+          if (doesNotHaveMinimumYAxisAfterRemoval || agg.onSecondaryYAxis) {
             $scope.vis.params.hasSecondaryYAxis = false;
             $scope.dual_y = '';
           }

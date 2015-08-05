@@ -61,6 +61,17 @@ define(function (require) {
      * @returns data object
      */
     DualYAxisStrategy.prototype.decorate = function (data) {
+      if (data.rows) {
+        _.map(data.rows, this._updateSeries, this);
+      } else if (data.columns) {
+        _.map(data.columns, this._updateSeries, this);
+      } else {
+        this._updateSeries(data);
+      }
+      return data;
+    };
+
+    DualYAxisStrategy.prototype._updateSeries = function (data) {
       if (data.series) {
         _.map(data.series, function (series) {
           var onSecondaryYAxis = series.onSecondaryYAxis;
@@ -69,7 +80,6 @@ define(function (require) {
           });
         });
       }
-      return data;
     };
 
     /**
