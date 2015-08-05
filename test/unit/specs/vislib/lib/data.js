@@ -21,6 +21,22 @@ define(function (require) {
     ]
   };
 
+  var seriesDataWithDualAxis = {
+    'label': '',
+    'series': [
+      {
+        'label': '100',
+        'values': [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 3}],
+        'onSecondaryYAxis': false
+      },
+      {
+        'label': '1001',
+        'values': [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 3}],
+        'onSecondaryYAxis': true
+      }
+    ]
+  };
+
   var rowsData = {
     'rows': [
       {
@@ -127,7 +143,7 @@ define(function (require) {
         expect(_.isObject(rowIn)).to.be(true);
       });
 
-      it('should not decorate the values if there is no secondary Axis', function () {
+      it('should decorate the values with false if there is no secondary Axis', function () {
         var seriesDataWithoutLabelInSeries = {
           'label': '',
           'series': [
@@ -143,10 +159,10 @@ define(function (require) {
         };
         var modifiedData = new Data(seriesDataWithoutLabelInSeries, {}, new SingleYAxisStrategy());
         _.map(modifiedData.data.series[0].values, function (value) {
-          expect(value.belongsToSecondaryYAxis).to.be(undefined);
+          expect(value.belongsToSecondaryYAxis).to.be(false);
         });
         _.map(modifiedData.data.series[1].values, function (value) {
-          expect(value.belongsToSecondaryYAxis).to.be(undefined);
+          expect(value.belongsToSecondaryYAxis).to.be(false);
         });
       });
 
@@ -278,7 +294,7 @@ define(function (require) {
       });
     });
 
-    describe('Data.flatten', function () {
+    describe('Data.flatten for single y axis', function () {
       var serIn;
       var rowIn;
       var colIn;
@@ -287,16 +303,18 @@ define(function (require) {
       var colOut;
 
       beforeEach(function () {
-        serIn = new Data(seriesData, {});
-        rowIn = new Data(rowsData, {});
-        colIn = new Data(colsData, {});
-        serOut = serIn.flatten();
-        rowOut = rowIn.flatten();
-        colOut = colIn.flatten();
+        serIn = new Data(seriesData, {}, new SingleYAxisStrategy());
+        rowIn = new Data(rowsData, {}, new SingleYAxisStrategy());
+        colIn = new Data(colsData, {}, new SingleYAxisStrategy());
+        serOut = serIn._flatten();
+        rowOut = rowIn._flatten();
+        colOut = colIn._flatten();
       });
 
       it('should return an array of value objects from every series', function () {
         expect(serOut.every(_.isObject)).to.be(true);
+        expect(rowOut.every(_.isObject)).to.be(true);
+        expect(colOut.every(_.isObject)).to.be(true);
       });
 
       it('should return all points from every series', testLength(seriesData));
@@ -305,16 +323,58 @@ define(function (require) {
 
       function testLength(inputData) {
         return function () {
-          var data = new Data(inputData, {});
+          var data = new Data(inputData, {}, new SingleYAxisStrategy());
           var len = _.reduce(data.chartData(), function (sum, chart) {
             return sum + chart.series.reduce(function (sum, series) {
               return sum + series.values.length;
             }, 0);
           }, 0);
 
-          expect(data.flatten()).to.have.length(len);
+          expect(data._flatten()).to.have.length(len);
         };
       }
+    });
+
+    describe('Data.flatten for dual y axis', function () {
+      var serIn;
+      var rowIn;
+      var colIn;
+      var serOutPrimary;
+      var serOutSecondary;
+      var rowOutPrimary;
+      var rowOutSecondary;
+      var colOutPrimary;
+      var colOutSecondary;
+
+      beforeEach(function () {
+        serIn = new Data(seriesData, {}, new DualYAxisStrategy());
+        rowIn = new Data(rowsData, {}, new DualYAxisStrategy());
+        colIn = new Data(colsData, {}, new DualYAxisStrategy());
+        serOutPrimary = serIn._flatten(true);
+        serOutSecondary = serIn._flatten(false);
+        rowOutPrimary = rowIn._flatten(true);
+        rowOutSecondary = rowIn._flatten(false);
+        colOutPrimary = colIn._flatten(true);
+        colOutSecondary = colIn._flatten(false);
+      });
+
+      it('should return an array of value objects from every series', function () {
+        expect(serOutPrimary.every(_.isObject)).to.be(true);
+        expect(serOutSecondary.every(_.isObject)).to.be(true);
+        expect(rowOutPrimary.every(_.isObject)).to.be(true);
+        expect(rowOutSecondary.every(_.isObject)).to.be(true);
+        expect(colOutPrimary.every(_.isObject)).to.be(true);
+        expect(colOutSecondary.every(_.isObject)).to.be(true);
+      });
+
+      it('should return all points for specific graph in the series', function () {
+        var data = new Data(seriesDataWithDualAxis, {}, new DualYAxisStrategy());
+        var primaryChartLength = data.chartData()[0].series[0].values.length;
+        var secondaryChartLength = data.chartData()[0].series[1].values.length;
+
+        expect(data._flatten(true)).to.have.length(primaryChartLength);
+        expect(data._flatten(false)).to.have.length(secondaryChartLength);
+      });
     });
 
     describe('getYMin method', function () {

@@ -77,6 +77,13 @@ define(function (require) {
     }
 
     /**
+     * Exposing flatten functionality of the strategies for it to be tested
+     */
+    Data.prototype._flatten = function (isPrimary) {
+      return this.yAxisStrategy._flatten(this.chartData(), isPrimary);
+    };
+
+    /**
      * Updates row or coloumns or series labels for y-axis
      */
     Data.prototype._updateData = function () {

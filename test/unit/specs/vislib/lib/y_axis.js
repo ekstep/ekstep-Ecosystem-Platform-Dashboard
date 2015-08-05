@@ -128,6 +128,10 @@ define(function (require) {
       it('should append ticks with text', function () {
         expect(el.selectAll('svg').selectAll('.tick text').length).to.be(1);
       });
+
+      it('should translate with a constant x component when on right orientation', function () {
+        expect(d3.transform(el.selectAll('svg').select('g').attr('transform')).translate[0]).to.be(4);
+      });
     });
 
     describe('getYScale Method', function () {

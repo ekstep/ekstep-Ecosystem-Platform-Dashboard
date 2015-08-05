@@ -25,6 +25,12 @@ define(function (require) {
         .value();
     };
 
+    DualYAxisStrategy.prototype._flatten = function (chartData, isPrimary) {
+      return isPrimary ?
+        this._primaryAxisFlatten(chartData) :
+        this._secondaryAxisFlatten(chartData);
+    };
+
     /**
      * Return an array of all value objects
      * Pluck the data.series array from all data object which belongs to secondary axis
@@ -88,8 +94,7 @@ define(function (require) {
         return 1;
       }
 
-      var flatData = this._primaryAxisFlatten(chartData);
-      return this._calculateYMax(chartData, flatData);
+      return this._calculateYMax(chartData, true);
     };
 
 
@@ -107,16 +112,16 @@ define(function (require) {
         return 1;
       }
 
-      var flatData = this._secondaryAxisFlatten(chartData);
-      return this._calculateYMax(chartData, flatData);
+      return this._calculateYMax(chartData, false);
     };
 
     /**
      * Caluates the max Y value across the charts
      */
-    DualYAxisStrategy.prototype._calculateYMax = function (chartData, flatData) {
+    DualYAxisStrategy.prototype._calculateYMax = function (chartData, isPrimary) {
       var self = this;
       var arr = [];
+      var flatData = this._flatten(chartData, isPrimary);
       // if there is only one data point and its less than zero,
       // return 0 as the yMax value.
       if (!flatData.length || flatData.length === 1 && flatData[0].y < 0) {
@@ -156,8 +161,7 @@ define(function (require) {
         return 0;
       }
 
-      var flat = this._primaryAxisFlatten(chartData);
-      return this._calculateYMin(chartData, flat);
+      return this._calculateYMin(chartData, true);
     };
 
     /**
@@ -175,15 +179,15 @@ define(function (require) {
         return 0;
       }
 
-      var flat = this._secondaryAxisFlatten(chartData);
-      return this._calculateYMin(chartData, flat);
+      return this._calculateYMin(chartData, false);
     };
     /**
      * Caluates the min Y value across the charts
      */
-    DualYAxisStrategy.prototype._calculateYMin = function (chartData, flatData) {
+    DualYAxisStrategy.prototype._calculateYMin = function (chartData, isPrimary) {
       var self = this;
       var arr = [];
+      var flatData = this._flatten(chartData, isPrimary);
       // if there is only one data point and its less than zero,
       // return 0 as the yMax value.
       if (!flatData.length || flatData.length === 1 && flatData[0].y > 0) {
